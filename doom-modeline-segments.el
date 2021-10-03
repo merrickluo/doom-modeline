@@ -1312,7 +1312,7 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
 (defun doom-modeline--override-phi-search-mode-line (orig-fun &rest args)
   "Override the mode-line of `phi-search' and `phi-replace'."
   (if (bound-and-true-p doom-modeline-mode)
-      (apply orig-fun mode-line-format (cdr args))
+      (apply orig-fun (doom-modeline--format) (cdr args))
     (apply orig-fun args)))
 (advice-add #'phi-search--initialize :around #'doom-modeline--override-phi-search-mode-line)
 
@@ -1487,9 +1487,9 @@ one. The ignored buffers are excluded unless `aw-ignore-on' is nil."
 ;; Remove original window number of `ace-window-display-mode'.
 (add-hook 'ace-window-display-mode-hook
           (lambda ()
-            (setq-default mode-line-format
-                          (assq-delete-all 'ace-window-display-mode
-                                           (default-value 'mode-line-format)))))
+            (setf (default-value (doom-modeline--format-name))
+                  (assq-delete-all 'ace-window-display-mode
+                                   (default-value (doom-modeline--format-name))))))
 
 (advice-add #'window-numbering-install-mode-line :override #'ignore)
 (advice-add #'window-numbering-clear-mode-line :override #'ignore)

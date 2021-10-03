@@ -538,6 +538,12 @@ It requires `circe' or `erc' package."
   :type 'function
   :group 'doom-modeline)
 
+(defcustom doom-modeline-position 'bottom
+  "Position of the mode line.
+set to `top' for header line, `bottom' for tranditional mode line."
+  :type '(top bottom)
+  :group 'doom-modeline)
+
 
 ;;
 ;; Faces
@@ -798,6 +804,16 @@ etc. (also see the face `doom-modeline-unread-number')."
 ;; Core helpers
 ;;
 
+(defun doom-modeline--format ()
+  "Return `header-line-format' or `mode-line-format'.
+base on the value of `doom-modeline-position'"
+  (symbol-value (doom-modeline--format-name)))
+
+(defun doom-modeline--format-name ()
+  (if (eq doom-modeline-position 'top)
+      'header-line-format
+    'mode-line-format))
+
 ;; FIXME #183: Force to calculate mode-line height
 ;; @see https://github.com/seagle0128/doom-modeline/issues/183
 ;; @see https://github.com/seagle0128/doom-modeline/issues/483
@@ -820,7 +836,7 @@ but it will only trigger a redisplay when there is a non nil
 from that of the `default' face. This function is intended to be
 used as an advice to window creation functions."
   (when (and (bound-and-true-p doom-modeline-mode)
-             mode-line-format
+             (doom-modeline--format)
              (/= (frame-char-height) (window-mode-line-height)))
     (redisplay t)))
 (unless (>= emacs-major-version 29)
@@ -994,8 +1010,8 @@ Throws an error if it doesn't exist."
 If DEFAULT is non-nil, set the default mode-line for all buffers."
   (when-let ((modeline (doom-modeline key)))
     (setf (if default
-              (default-value 'mode-line-format)
-            (buffer-local-value 'mode-line-format (current-buffer)))
+              (default-value (doom-modeline--format-name))
+            (buffer-local-value (doom-modeline--format-name) (current-buffer)))
           (list "%e" modeline))))
 
 

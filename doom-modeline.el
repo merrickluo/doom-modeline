@@ -277,11 +277,11 @@ If DEFAULT is non-nil, set the default mode-line for all buffers."
         (advice-add #'helm-display-mode-line :after #'doom-modeline-set-helm-modeline))
     (progn
       ;; Restore mode-line
-      (let ((original-format (doom-modeline--original-value 'mode-line-format)))
-        (setq-default mode-line-format original-format)
+      (let ((original-format (doom-modeline--original-value (doom-modeline--format-name))))
+        (setf (default-value (doom-modeline--format-name)) original-format)
         (dolist (buf (buffer-list))
           (with-current-buffer buf
-            (setq mode-line-format original-format))))
+            (setf (buffer-local-value (doom-modeline--format-name) buf) original-format))))
 
       ;; For two-column editing
       (setq 2C-mode-line-format (doom-modeline--original-value '2C-mode-line-format))
